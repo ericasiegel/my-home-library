@@ -4,11 +4,16 @@ from django.contrib import admin
 from .models import *
 
 # generic function to get a string of any many to many field
-def concatenate_related(obj, related_field_name):
+def get_related(obj, related_field_name):
     related_objects = getattr(obj, related_field_name).all()
     names = [str(related_obj) for related_obj in related_objects]
     return ', '.join(names)
 
+def short_description(description):
+    def decorator(func):
+        func.short_description = description
+        return func
+    return decorator
 
 
 # Register your models here.
@@ -33,11 +38,11 @@ class BookAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('authors', 'genres')
     
+    @short_description('Author(s)')
     def author_names(self, book):
-        return concatenate_related(book, 'authors')
-    author_names.short_description = 'Author(s)'
+        return get_related(book, 'authors')
     
+    @short_description('Genres')
     def genre_list(self, book):
-        return concatenate_related(book, 'genres')
-    genre_list.short_description = 'Genres'
+        return get_related(book, 'genres')
     
