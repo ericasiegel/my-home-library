@@ -19,16 +19,25 @@ def short_description(description):
 # Register your models here.
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
+    list_display = ['id', 'name', 'books_list']
+    
+    @short_description('Books')
+    def books_list(self, author):
+        return get_related(author, 'author_books')
 
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ['id', 'type']
     
+    
 @admin.register(Series)
 class SeriesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name']
+    list_display = ['id', 'name', 'books_list']
+    
+    @short_description('Books')
+    def books_list(self, series):
+        return get_related(series, 'series_books')
     
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):

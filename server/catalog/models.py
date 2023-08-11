@@ -29,3 +29,5 @@ class Book(models.Model):
     genres = models.ManyToManyField(Genre, related_name='genre_books')
     # picture = models.ImageField()
     
+    def __str__(self):
+        return self.title
