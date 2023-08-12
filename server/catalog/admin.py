@@ -1,45 +1,39 @@
-
 from django.contrib import admin
-
+from .generics import annotate_and_prefetch, get_related_names, short_description, create_link_to_changelist
 from .models import *
-
-# generic function to get a string of any many to many field
-def get_related(obj, related_field_name):
-    related_objects = getattr(obj, related_field_name).all()
-    names = [str(related_obj) for related_obj in related_objects]
-    return ', '.join(names)
-
-def get_count(obj, related_field_name):
-    return getattr(obj, related_field_name).count()
-
-def short_description(description):
-    def decorator(func):
-        func.short_description = description
-        return func
-    return decorator
 
 
 # Register your models here.
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'book_count', 'books_list']
-    
+
     @short_description('Books')
     def books_list(self, author):
-        return get_related(author, 'author_books')
+        return get_related_names(author, 'author_books')
     
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return annotate_and_prefetch(queryset, 'author_books', 'author_books')
+
+    # counting books
     @short_description('Count In Library')
     def book_count(self, author):
-        return get_count(author, 'author_books')
-
+        return create_link_to_changelist('admin:catalog_book_changelist', 'authors__id', author, 'book_count')
+    
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ['id', 'type', 'book_count']
     
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return annotate_and_prefetch(queryset, 'genre_books', 'genre_books')
+
+    # counting books
     @short_description('Count In Library')
     def book_count(self, genre):
-        return get_count(genre, 'genre_books')
+       return create_link_to_changelist('admin:catalog_book_changelist', 'genres__id', genre, 'book_count')
     
     
 @admin.register(Series)
@@ -48,11 +42,16 @@ class SeriesAdmin(admin.ModelAdmin):
     
     @short_description('My Books')
     def books_list(self, series):
-        return get_related(series, 'series_books')
+        return get_related_names(series, 'series_books')
     
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        return annotate_and_prefetch(queryset, 'series_books', 'series_books')
+
+    # counting books
     @short_description('Count In Library')
     def book_count(self, series):
-        return get_count(series, 'series_books')
+        return create_link_to_changelist('admin:catalog_book_changelist', 'series__id', series, 'book_count')
     
     
 @admin.register(Book)
@@ -65,9 +64,9 @@ class BookAdmin(admin.ModelAdmin):
     
     @short_description('Author(s)')
     def author_names(self, book):
-        return get_related(book, 'authors')
+        return get_related_names(book, 'authors')
     
     @short_description('Genres')
     def genre_list(self, book):
-        return get_related(book, 'genres')
+        return get_related_names(book, 'genres')
     
