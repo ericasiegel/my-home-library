@@ -66,6 +66,7 @@ class BookAdmin(admin.ModelAdmin):
     list_editable = ['read']
     list_per_page = 10
     search_fields = ['title__icontains', 'authors__name__icontains', 'series__name__icontains']
+    list_filter = ['authors', 'series', 'genres', 'read']
     
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('authors', 'genres')
