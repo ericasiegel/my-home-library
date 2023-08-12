@@ -7,10 +7,15 @@ from .models import *
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
     list_display = ['id', 'name', 'book_count', 'books_list']
+    search_fields=['name']
 
     @short_description('Books')
     def books_list(self, author):
         return get_related_names(author, 'author_books')
+    
+    @short_description('Series')
+    def books_list(self, author):
+        return get_related_names(author, 'author_series')
     
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -25,12 +30,12 @@ class AuthorAdmin(admin.ModelAdmin):
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = ['id', 'type', 'book_count']
+    search_fields=['type']
     
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
         return annotate_and_prefetch(queryset, 'genre_books', 'genre_books')
 
-    # counting books
     @short_description('Count In Library')
     def book_count(self, genre):
        return create_link_to_changelist('admin:catalog_book_changelist', 'genres__id', genre, 'book_count')
@@ -38,7 +43,8 @@ class GenreAdmin(admin.ModelAdmin):
     
 @admin.register(Series)
 class SeriesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'total_books', 'book_count', 'books_list']
+    list_display = ['id', 'name', 'author', 'total_books', 'book_count', 'books_list']
+    search_fields=['name__icontains', 'author__name__icontains']
     
     @short_description('My Books')
     def books_list(self, series):
@@ -58,6 +64,8 @@ class SeriesAdmin(admin.ModelAdmin):
 class BookAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'series', 'series_number', 'author_names', 'read', 'description', 'genre_list']
     list_editable = ['read']
+    list_per_page = 10
+    search_fields = ['title__icontains', 'authors__name__icontains', 'series__name__icontains']
     
     def get_queryset(self, request):
         return super().get_queryset(request).prefetch_related('authors', 'genres')
