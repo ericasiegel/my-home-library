@@ -1,6 +1,11 @@
-from django.http import HttpResponse
-from django.shortcuts import render
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 # Create your views here.
-def index(request):
-    return HttpResponse('My Library')
+@api_view()
+def author_list(request):
+    return Response('ok')
+    
+@api_view()
+def author_detail(request, id):
+    return Response(id)
