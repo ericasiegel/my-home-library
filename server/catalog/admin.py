@@ -9,6 +9,9 @@ def get_related(obj, related_field_name):
     names = [str(related_obj) for related_obj in related_objects]
     return ', '.join(names)
 
+def get_count(obj, related_field_name):
+    return getattr(obj, related_field_name).count()
+
 def short_description(description):
     def decorator(func):
         func.short_description = description
@@ -19,25 +22,38 @@ def short_description(description):
 # Register your models here.
 @admin.register(Author)
 class AuthorAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'books_list']
+    list_display = ['id', 'name', 'book_count', 'books_list']
     
     @short_description('Books')
     def books_list(self, author):
         return get_related(author, 'author_books')
+    
+    @short_description('Count In Library')
+    def book_count(self, author):
+        return get_count(author, 'author_books')
 
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    list_display = ['id', 'type']
+    list_display = ['id', 'type', 'book_count']
+    
+    @short_description('Count In Library')
+    def book_count(self, genre):
+        return get_count(genre, 'genre_books')
     
     
 @admin.register(Series)
 class SeriesAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'books_list']
+    list_display = ['id', 'name', 'total_books', 'book_count', 'books_list']
     
-    @short_description('Books')
+    @short_description('My Books')
     def books_list(self, series):
         return get_related(series, 'series_books')
+    
+    @short_description('Count In Library')
+    def book_count(self, series):
+        return get_count(series, 'series_books')
+    
     
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):

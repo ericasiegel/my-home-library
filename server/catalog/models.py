@@ -15,6 +15,7 @@ class Genre(models.Model):
     
 class Series(models.Model):
     name = models.CharField(max_length=255)
+    total_books = models.IntegerField()
     
     def __str__(self):
         return self.name
