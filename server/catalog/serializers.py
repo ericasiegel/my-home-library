@@ -19,12 +19,35 @@ class SeriesNameSerializer(serializers.ModelSerializer):
         model = Series
         fields = ['id', 'name']
 
-
-# General Serializers
-class GenreSerializer(serializers.ModelSerializer):
+class GenreTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
         fields = ['id', 'type']
+
+
+# Main Serializers
+class GenreSerializer(serializers.ModelSerializer):
+    count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
+    
+    class Meta:
+        model = Genre
+        fields = ['id', 'type', 'count_in_library']
+        
+    def calculate_books(self, genre: Genre):
+        return genre.genre_books.count()
+    
+    
+class SeriesSerializer(serializers.ModelSerializer):
+    count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
+    books = BookTitleSerializer(many=True, read_only=True)
+    author = AuthorNameSerializer()
+    
+    class Meta:
+        model = Series
+        fields = ['id', 'name', 'total_books', 'count_in_library', 'books', 'author']
+        
+    def calculate_books(self, series: Series):
+        return series.series_books.count()
         
           
 class AuthorSerializer(serializers.ModelSerializer):
@@ -42,7 +65,7 @@ class AuthorSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     authors = AuthorNameSerializer(many=True, read_only=True)
     series = SeriesNameSerializer()
-    genres = GenreSerializer(many=True, read_only=True)
+    genres = GenreTypeSerializer(many=True, read_only=True)
     
     class Meta:
         model = Book

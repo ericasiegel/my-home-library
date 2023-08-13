@@ -29,3 +29,29 @@ def author_detail(request, id):
     author = Author.objects.get(pk=id)
     serializer = AuthorSerializer(author)
     return Response(serializer.data)
+
+
+@api_view()
+def series_list(request):
+    queryset = Series.objects.all()
+    serializer = SeriesSerializer(queryset, many=True)
+    return Response(serializer.data)
+    
+@api_view()
+def series_detail(request, id):
+    series = Series.objects.get(pk=id)
+    serializer = SeriesSerializer(series)
+    return Response(serializer.data)
+
+
+@api_view()
+def genre_list(request):
+    queryset = Genre.objects.all()
+    serializer = GenreSerializer(queryset, many=True)
+    return Response(serializer.data)
+    
+@api_view()
+def genre_detail(request, id):
+    genre = Genre.objects.get(pk=id)
+    serializer = GenreSerializer(genre)
+    return Response(serializer.data)
