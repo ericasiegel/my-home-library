@@ -1,14 +1,12 @@
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 from . import views
 
+router = SimpleRouter()
+router.register('books', views.BookViewSet, basename='books')
+router.register('authors', views.AuthorViewSet, basename='authors')
+router.register('series', views.SeriesViewSet, basename='series')
+router.register('genres', views.GenreViewSet, basename='genres')
 
-urlpatterns = [
-    path('authors/', views.author_list),
-    path('authors/<int:id>/', views.author_detail),
-    path('books/', views.book_list),
-    path('books/<int:id>/', views.book_detail),
-    path('genres/', views.genre_list),
-    path('genres/<int:id>/', views.genre_detail),
-    path('series/', views.series_list),
-    path('series/<int:id>/', views.series_detail),
-]
+
+urlpatterns = router.urls

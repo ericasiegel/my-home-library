@@ -1,57 +1,22 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 from .models import *
 from .serializers import *
 
 # Create your views here.
-@api_view()
-def book_list(request):
+
+class BookViewSet(ModelViewSet):
     queryset = Book.objects.all()
-    serializer = BookSerializer(queryset, many=True)
-    return Response(serializer.data)
+    serializer_class = BookSerializer
 
-@api_view()
-def book_detail(request, id):
-    book = Book.objects.get(pk=id)
-    serializer = BookSerializer(book)
-    return Response(serializer.data)
-
-
-
-@api_view()
-def author_list(request):
+class AuthorViewSet(ModelViewSet):
     queryset = Author.objects.all()
-    serializer = AuthorSerializer(queryset, many=True)
-    return Response(serializer.data)
+    serializer_class = AuthorSerializer
     
-@api_view()
-def author_detail(request, id):
-    author = Author.objects.get(pk=id)
-    serializer = AuthorSerializer(author)
-    return Response(serializer.data)
-
-
-@api_view()
-def series_list(request):
+class SeriesViewSet(ModelViewSet):
     queryset = Series.objects.all()
-    serializer = SeriesSerializer(queryset, many=True)
-    return Response(serializer.data)
+    serializer_class = SeriesSerializer
     
-@api_view()
-def series_detail(request, id):
-    series = Series.objects.get(pk=id)
-    serializer = SeriesSerializer(series)
-    return Response(serializer.data)
-
-
-@api_view()
-def genre_list(request):
+class GenreViewSet(ModelViewSet):
     queryset = Genre.objects.all()
-    serializer = GenreSerializer(queryset, many=True)
-    return Response(serializer.data)
-    
-@api_view()
-def genre_detail(request, id):
-    genre = Genre.objects.get(pk=id)
-    serializer = GenreSerializer(genre)
-    return Response(serializer.data)
+    serializer_class = GenreSerializer
+
