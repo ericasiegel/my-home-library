@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 # Create your models here.
@@ -14,7 +15,7 @@ class Genre(models.Model):
         return self.type
     
 class Series(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     total_books = models.IntegerField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='author_series')
     
@@ -29,6 +30,7 @@ class Book(models.Model):
     read = models.BooleanField(default=False)
     description = models.CharField(max_length=500)
     genres = models.ManyToManyField(Genre, related_name='genre_books')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # picture = models.ImageField()
     
     def __str__(self):
