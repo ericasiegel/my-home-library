@@ -51,9 +51,9 @@ class SeriesSerializer(serializers.ModelSerializer):
         return series.series_books.count()
     
     def create(self, validated_data):
-        author = validated_data.pop('author', None) # Note the change to 'author'
+        author = validated_data.pop('author', None) 
 
-        series = Series.objects.create(**validated_data, author=author) # Assign the author directly
+        series = Series.objects.create(**validated_data, author=author) 
         series.save()
         return series
     
@@ -67,12 +67,13 @@ class SeriesSerializer(serializers.ModelSerializer):
         representation.pop('get_authors', None)
         return representation
 
+
         
           
 class AuthorSerializer(serializers.ModelSerializer):
     count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
-    books = BookTitleSerializer(source='author_books', many=True, read_only=True) # Fixed here
-    series = SeriesNameSerializer(source='author_series', many=True, read_only=True) # And here
+    books = BookTitleSerializer(source='author_books', many=True, read_only=True) 
+    series = SeriesNameSerializer(source='author_series', many=True, read_only=True) 
     
     class Meta:
         model = Author
