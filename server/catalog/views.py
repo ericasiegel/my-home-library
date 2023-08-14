@@ -1,6 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+
+from .pagination import DefaultPagination
 from .models import *
 from .serializers import *
 
@@ -23,6 +25,7 @@ class AuthorViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ['name', 'author_books__title', 'author_series__name']
     ordering_fields = ['name', 'author_books__title', 'author_series__name']
+
     
 class SeriesViewSet(ModelViewSet):
     queryset = Series.objects.all()
