@@ -26,18 +26,15 @@ class GenreTypeSerializer(serializers.ModelSerializer):
 
 # Main Serializers
 class GenreSerializer(serializers.ModelSerializer):
-    count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
+    count_in_library = serializers.IntegerField(read_only=True)
     
     class Meta:
         model = Genre
         fields = ['id', 'type', 'count_in_library']
-        
-    def calculate_books(self, genre: Genre):
-        return genre.genre_books.count()
     
     
 class SeriesSerializer(serializers.ModelSerializer):
-    count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
+    count_in_library = serializers.IntegerField(read_only=True)
     books = BookTitleSerializer(many=True, read_only=True)
     author = AuthorNameSerializer(read_only=True)
     
@@ -46,9 +43,6 @@ class SeriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Series
         fields = ['id', 'name', 'total_books', 'count_in_library', 'books', 'author', 'get_authors']
-        
-    def calculate_books(self, series: Series):
-        return series.series_books.count()
     
     def create(self, validated_data):
         author = validated_data.pop('author', None) 
@@ -67,9 +61,7 @@ class SeriesSerializer(serializers.ModelSerializer):
         representation.pop('get_authors', None)
         return representation
 
-
         
-          
 class AuthorSerializer(serializers.ModelSerializer):
     count_in_library = serializers.SerializerMethodField(method_name='calculate_books')
     books = BookTitleSerializer(source='author_books', many=True, read_only=True) 
@@ -82,8 +74,7 @@ class AuthorSerializer(serializers.ModelSerializer):
     def calculate_books(self, author: Author):
         return author.author_books.count()
 
-    
-    
+     
 class BookSerializer(serializers.ModelSerializer):
     get_authors = serializers.PrimaryKeyRelatedField(source='authors', many=True, queryset=Author.objects.all(), write_only=True)
     get_series = serializers.PrimaryKeyRelatedField(source='series', allow_null=True, required=False, queryset=Series.objects.all(), write_only=True)

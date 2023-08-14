@@ -1,15 +1,14 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-
-from .pagination import DefaultPagination
+from django.db.models import Count
 from .models import *
 from .serializers import *
 
 # Create your views here.
 
 class BookViewSet(ModelViewSet):
-    queryset = Book.objects.all()
+    queryset = Book.objects.prefetch_related('authors', 'genres', 'series').all()
     serializer_class = BookSerializer
     
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -19,7 +18,7 @@ class BookViewSet(ModelViewSet):
 
 
 class AuthorViewSet(ModelViewSet):
-    queryset = Author.objects.all()
+    queryset = Author.objects.prefetch_related('author_books', 'author_series').all()
     serializer_class = AuthorSerializer
     
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -28,13 +27,16 @@ class AuthorViewSet(ModelViewSet):
 
     
 class SeriesViewSet(ModelViewSet):
-    queryset = Series.objects.all()
+    queryset = Series.objects.prefetch_related('author').all()
     serializer_class = SeriesSerializer
     
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_fields = ['author_id']
     search_fields = ['name', 'author__name']
     ordering_fields = ['name', 'author__name']
+    
+    def get_queryset(self):
+        return Series.objects.annotate(count_in_library=Count('series_books')).prefetch_related('author')
 
     
 class GenreViewSet(ModelViewSet):
@@ -43,3 +45,6 @@ class GenreViewSet(ModelViewSet):
 
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     ordering_fields = ['type']
+    
+    def get_queryset(self):
+        return Genre.objects.annotate(count_in_library=Count('genre_books'))
