@@ -56,6 +56,11 @@ class SeriesSerializer(serializers.ModelSerializer):
         series = Series.objects.create(**validated_data, author=author) # Assign the author directly
         series.save()
         return series
+    
+    def update(self, instance, validated_data):
+        instance.total_books = validated_data.get('total_books', instance.total_books)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -90,7 +95,7 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ['id', 'title', 'description', 'read', 'series', 'series_number', 'get_authors', 'get_genres', 'get_series', 'authors', 'genres']
-
+        
     def create(self, validated_data):
         authors = validated_data.pop('authors')
         genres = validated_data.pop('genres')
@@ -102,6 +107,11 @@ class BookSerializer(serializers.ModelSerializer):
         book.series = series
         book.save()
         return book
+    
+    def update(self, instance, validated_data):
+        instance.read = validated_data.get('read', instance.read)
+        instance.save()
+        return instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
